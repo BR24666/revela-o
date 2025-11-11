@@ -1,0 +1,57 @@
+# Super Analista BTC/USDT - Cursor Rules
+
+## Estrutura do Projeto
+
+Este é um projeto full-stack para análise preditiva de BTC/USDT usando ML.
+
+### Frontend
+- Next.js 14 com TypeScript
+- Tailwind CSS
+- Supabase Realtime
+- Componentes em `components/`
+
+### Backend
+- Python 3.10+
+- Machine Learning com XGBoost
+- Binance API para dados
+- Supabase para persistência
+- Código em `python_backend/`
+
+## Convenções de Código
+
+### TypeScript/React
+- Use TypeScript estrito
+- Componentes funcionais com hooks
+- Nome de arquivos: PascalCase.tsx
+- Use 'use client' para componentes com estado
+
+### Python
+- PEP 8
+- Type hints onde possível
+- Docstrings em funções principais
+- Nome de arquivos: snake_case.py
+
+## Regras de Desenvolvimento
+
+1. **Não modifique** as 10 regras probabilísticas sem consultar o briefing
+2. **Features ML**: Sempre manter sincronizado com FEATURE_COLUMNS em config.py
+3. **Supabase**: Schema changes devem ser documentadas em schema.sql
+4. **Performance**: Backend deve processar velas em < 1 segundo
+
+## Testing
+
+- Frontend: npm run lint
+- Backend: python -m pytest (se configurado)
+- Testar integração: executar engine e verificar sinais no banco
+
+## Deploy
+
+- Frontend: Vercel (automático via git push)
+- Backend: VPS com systemd service (ver DEPLOY.md)
+
+## Manutenção
+
+- Retreinar modelo semanalmente
+- Monitorar winrate no dashboard
+- Backup Supabase mensalmente
+
