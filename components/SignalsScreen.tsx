@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { TrendingUp, TrendingDown, Clock, Activity } from 'lucide-react'
 
@@ -19,6 +19,31 @@ export default function SignalsScreen() {
   const [recentSignals, setRecentSignals] = useState<Signal[]>([])
   const [loading, setLoading] = useState(true)
   const [minConfidence, setMinConfidence] = useState(75)
+
+  const loadSignals = useCallback(async () => {
+    try {
+      setLoading(true)
+      
+      // Buscar sinais recentes (últimas 24h)
+      const { data, error } = await supabase
+        .from('signals')
+        .select('*')
+        .gte('confidence_score', minConfidence)
+        .order('timestamp', { ascending: false })
+        .limit(10)
+
+      if (error) throw error
+
+      if (data && data.length > 0) {
+        setLatestSignal(data[0] as Signal)
+        setRecentSignals(data as Signal[])
+      }
+    } catch (error) {
+      console.error('Erro ao carregar sinais:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [minConfidence])
 
   useEffect(() => {
     loadSignals()
@@ -61,32 +86,7 @@ export default function SignalsScreen() {
     return () => {
       subscription.unsubscribe()
     }
-  }, [minConfidence, latestSignal?.id])
-
-  async function loadSignals() {
-    try {
-      setLoading(true)
-      
-      // Buscar sinais recentes (últimas 24h)
-      const { data, error } = await supabase
-        .from('signals')
-        .select('*')
-        .gte('confidence_score', minConfidence)
-        .order('timestamp', { ascending: false })
-        .limit(10)
-
-      if (error) throw error
-
-      if (data && data.length > 0) {
-        setLatestSignal(data[0])
-        setRecentSignals(data)
-      }
-    } catch (error) {
-      console.error('Erro ao carregar sinais:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [minConfidence, latestSignal?.id, loadSignals])
 
   function formatTime(timestamp: string) {
     return new Date(timestamp).toLocaleTimeString('pt-BR', {

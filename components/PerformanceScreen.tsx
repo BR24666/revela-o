@@ -4,6 +4,16 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { TrendingUp, TrendingDown, Target, Percent } from 'lucide-react'
 
+interface Signal {
+  id: string
+  timestamp: string
+  prediction: 'CALL' | 'PUT'
+  confidence_score: number
+  open_price: number
+  close_price: number | null
+  result: 'WIN' | 'LOSS' | 'PENDING' | null
+}
+
 interface Stats {
   total: number
   wins: number
@@ -36,11 +46,13 @@ export default function PerformanceScreen() {
       setLoading(true)
 
       // Buscar todos os sinais com resultado
-      const { data: signals, error } = await supabase
+      const { data, error } = await supabase
         .from('signals')
         .select('*')
         .in('result', ['WIN', 'LOSS'])
         .order('timestamp', { ascending: false })
+      
+      const signals = data as Signal[] | null
 
       if (error) throw error
 
